@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+select(STDERR);
+$| = 1;
+select(STDOUT);
+$| = 1;
+
+foreach my $i (0..10) {
+    print("Line $i\n");
+    sleep(2);
+}
