@@ -2,15 +2,23 @@ local netstring = require'netstring'
 local pairs = pairs
 local tonumber = tonumber
 local unix
+local table_unpack
 
 if ngx then
-  unix = ngx.socket.tcp
+    unix = ngx.socket.tcp
 else
-  unix = require'socket.unix'
+    unix = require'socket.unix'
 end
 
+if unpack then
+    table_unpack = unpack
+else
+    table_unpack = table.unpack
+end
+
+
 local _M = {
-  _VERSION = '1.0.0'
+  _VERSION = '1.1.1'
 }
 
 function _M.new(address)
@@ -137,7 +145,7 @@ function _M.new(address)
     setmetatable(o,
         { __call = function(...)
             local args = {...}
-            return o.exec(unpack(args))
+            return o.exec(table_unpack(args))
         end })
 
     return o, nil
