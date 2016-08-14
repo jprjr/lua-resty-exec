@@ -92,14 +92,16 @@ function _M.new(address)
                         if not curfield then curfield = v
                         else
                             if curfield == "stdout" then
-                                ret.stdout = ret.stdout .. v
                                 if self.stdout then
                                     self.stdout(v)
+                                else
+                                    ret.stdout = ret.stdout .. v
                                 end
                             elseif curfield == "stderr" then
-                                ret.stderr = ret.stderr .. v
                                 if self.stderr then
                                     self.stderr(v)
+                                else
+                                    ret.stderr = ret.stderr .. v
                                 end
                             elseif curfield == "exitcode" then
                                 ret.exitcode = ret.exitcode .. v
