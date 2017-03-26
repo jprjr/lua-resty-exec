@@ -18,7 +18,7 @@ end
 
 
 local _M = {
-  _VERSION = '1.1.2'
+  _VERSION = '1.1.3'
 }
 
 function _M.new(address)
@@ -32,7 +32,8 @@ function _M.new(address)
         stdin = nil,
         stdout = nil,
         stderr = nil,
-        bufsize = 4096
+        bufsize = 4096,
+        timeout_fatal = true,
     }
 
     function o.exec(self,...)
@@ -52,6 +53,7 @@ function _M.new(address)
                     end
                 end
                 if args[1].stdin then self.stdin = args[1].stdin end
+                if args[1].timeout_fatal then self.timeout_fatal = args[1].timeout_fatal end
             else
                 self.argv = args
             end
@@ -80,8 +82,20 @@ function _M.new(address)
 
         while(not err) do
             data, err, partial = c:receive(self.bufsize)
-            if err and err ~= "closed" then
-               return nil, err
+            if err then
+                if err == 'timeout' then
+                    if self.timeout_fatal then
+                        return nil, err
+                   else
+                        err = nil
+                    end
+                else
+                    if err ~= 'timeout' and err ~= 'closed' then
+                        return nil, err
+                    else
+                        err = nil
+                    end
+                end
             end
 
             if data then

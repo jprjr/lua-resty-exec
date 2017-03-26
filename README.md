@@ -102,6 +102,19 @@ local res, err = prog('some-program')
 
 ```
 
+### Treat timeouts as non-errors
+
+By default, `sockexec` treats a timeout as an error. You can disable this by
+setting the object's `timeout_fatal` key to false. Examples:
+
+```lua
+-- set timeout_fatal = false on the prog objects
+prog.timeout_fatal = false
+
+-- or, set it at calltime:
+local res, err = prog({argv = {'cat'}, timeout_fatal = false})
+```
+
 ### But I actually want a shell!
 
 Not a problem! You can just do something like:
