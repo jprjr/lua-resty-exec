@@ -18,7 +18,7 @@ end
 
 
 local _M = {
-  _VERSION = '1.1.3'
+  _VERSION = '1.1.4'
 }
 
 function _M.new(address)
@@ -92,8 +92,6 @@ function _M.new(address)
                 else
                     if err ~= 'timeout' and err ~= 'closed' then
                         return nil, err
-                    else
-                        err = nil
                     end
                 end
             end
