@@ -142,6 +142,31 @@ prog.stdin = script_data
 local res, err = prog('bash')
 ```
 
+### Daemonizing processes
+
+I generally recommend against daemonizing processes - I think it's far
+better to use some kind of message queue and/or supervision system, so
+you can monitor processes, take actions on failure, and so on.
+
+That said, if you want to spin off some process, you could use
+`start-stop-daemon`, ie:
+
+```lua
+local res, err = prog('start-stop-daemon','--pidfile','/dev/null','--background','--exec','/usr/bin/sleep', '--start','--','10')
+```
+
+will spawn `sleep 10` as a detached background process.
+
+If you don't want to deal with `start-stop-daemon`, I have a small utility
+for spawning a background program called [idgaf](https://github.com/jprjr/idgaf), ie:
+
+```lua
+local res, err = prog('idgaf','sleep','10')
+```
+
+This will basically accomplish the same thing `start-stop-daemon` does without
+requiring a billion flags.
+
 
 ## Some example nginx configs
 
