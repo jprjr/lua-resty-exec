@@ -14,6 +14,18 @@ to worry about shell escaping/quoting/parsing rules.
 This requires your web server to have an active instance of
 [sockexec](https://github.com/jprjr/sockexec) running.
 
+## Installation
+
+`lua-resty-exec` is available on [luarocks](https://luarocks.org/modules/jprjr/lua-resty-exec)
+as well as [opm](https://opm.openresty.org/), you can install it with `luarocks install
+lua-resty-exec` or `opm get jprjr/lua-resty-exec`.
+
+If you're using this outside of OpenResty, you'll also need the LuaSocket
+module installed, ie `luarocks install luasocket`.
+
+Additionally, you'll need `sockexec` running, see [its repo](https://github.com/jprjr/sockexec)
+for instructions.
+
 ## Usage
 
 ```lua
