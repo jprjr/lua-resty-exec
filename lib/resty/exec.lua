@@ -42,6 +42,9 @@ function _M.new(address)
 
         local buffer = ""
         local ret = {stdout = "", stderr = "", exitcode = "", termsig = ""}
+        
+        -- detach callbacks from self
+        local det_stdout, det_stderr
 
         if #args > 0 then
             if type(args[1]) == "table" then
@@ -54,6 +57,23 @@ function _M.new(address)
                 end
                 if args[1].stdin then self.stdin = args[1].stdin end
                 if args[1].timeout_fatal then self.timeout_fatal = args[1].timeout_fatal end
+                
+                if args[1].stdout then
+                    if type(args[1].stdout) == "function" then
+                        det_stdout = args[1].stdout
+                    else
+                        return nil, "invalid argument 'stdout' (requires function)"
+                    end
+                end
+                
+                if args[1].stderr then
+                    if type(args[1].stderr) == "function" then
+                        det_stderr = args[1].stderr
+                    else
+                        return nil, "invalid argument 'stderr' (requires function)"
+                    end
+                end
+
             else
                 self.argv = args
             end
@@ -112,13 +132,17 @@ function _M.new(address)
                         if not curfield then curfield = v
                         else
                             if curfield == "stdout" then
-                                if self.stdout then
+                                if det_stdout then
+                                    det_stdout(v)
+                                elseif self.stdout then
                                     self.stdout(v)
                                 else
                                     ret.stdout = ret.stdout .. v
                                 end
                             elseif curfield == "stderr" then
-                                if self.stderr then
+                                if det_stderr then
+                                    det_stderr(v)
+                                elseif self.stderr then
                                     self.stderr(v)
                                 else
                                     ret.stderr = ret.stderr .. v
