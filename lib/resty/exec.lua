@@ -18,7 +18,7 @@ end
 
 
 local _M = {
-  _VERSION = '1.1.4'
+  _VERSION = '1.2.0'
 }
 
 function _M.new(address)
