@@ -78,19 +78,22 @@ local res, err = prog('cat')
 ngx.print(res.stdout)
 ```
 
-### Call with explicit argv and stdin
+### Call with explicit argv, stdin data, stdout/stderr callbacks
 
 ```lua
-local res, err = prog( { argv = 'cat', stdin = 'fun!' } )
+local res, err = prog( {
+    argv = 'cat',
+    stdin = 'fun!',
+    stdout = function(data) print(data) end,
+    stderr = function(data) print("error:", data) end
+} )
 
--- res = { stdout = "fun!", stderr = nil, exitcode = 0, termsig = nil }
+-- res = { stdout = nil, stderr = nil, exitcode = 0, termsig = nil }
 -- err = nil
-
-ngx.print(res.stdout)
+-- 'fun!' is printed
 ```
 
 Note: here `argv` is a string, which is fine if your program doesn't need any
-arguments.
 
 ### Setup stdout/stderr callbacks
 
