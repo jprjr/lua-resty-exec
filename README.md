@@ -93,7 +93,8 @@ local res, err = prog( {
 -- 'fun!' is printed
 ```
 
-Note: here `argv` is a string, which is fine if your program doesn't need any
+Note: here `argv` is a string, which is fine if your program doesn't need
+any arguments.
 
 ### Setup stdout/stderr callbacks
 
@@ -143,6 +144,8 @@ Or if you want to run an entire script:
 ```lua
 prog.stdin = script_data
 local res, err = prog('bash')
+
+-- this is roughly equivalent to running `bash < script` on the CLI
 ```
 
 ### Daemonizing processes
