@@ -2,29 +2,22 @@ local netstring = require'netstring'
 local pairs = pairs
 local tonumber = tonumber
 local unix
-local table_unpack
+local table_unpack = unpack or table.unpack -- luacheck: compat
 
-if ngx then
-    unix = ngx.socket.tcp
+if ngx then -- luacheck: ignore
+    unix = ngx.socket.tcp -- luacheck: ignore
 else
     unix = require'socket.unix'
 end
 
-if unpack then
-    table_unpack = unpack
-else
-    table_unpack = table.unpack
-end
-
-
 local _M = {
-  _VERSION = '1.2.0'
+  _VERSION = '1.2.1'
 }
 
 function _M.new(address)
     if not address then return nil, "must supply an address" end
     local a = address
-    if ngx then
+    if ngx then -- luacheck: ignore
         a = 'unix:' .. a
     end
     local o = {
@@ -38,11 +31,11 @@ function _M.new(address)
 
     function o.exec(self,...)
         local args = {...}
-        local c, err, ns, nserr, success, data, partial, curfield
+        local c, err, ns, nserr, data, partial, curfield, _
 
         local buffer = ""
         local ret = {stdout = "", stderr = "", exitcode = "", termsig = ""}
-        
+
         -- detach callbacks from self
         local det_stdout, det_stderr
 
@@ -57,7 +50,7 @@ function _M.new(address)
                 end
                 if args[1].stdin then self.stdin = args[1].stdin end
                 if args[1].timeout_fatal then self.timeout_fatal = args[1].timeout_fatal end
-                
+
                 if args[1].stdout then
                     if type(args[1].stdout) == "function" then
                         det_stdout = args[1].stdout
@@ -65,7 +58,7 @@ function _M.new(address)
                         return nil, "invalid argument 'stdout' (requires function)"
                     end
                 end
-                
+
                 if args[1].stderr then
                     if type(args[1].stderr) == "function" then
                         det_stderr = args[1].stderr
@@ -95,7 +88,7 @@ function _M.new(address)
         c, err = unix()
         if err then return nil, err end
 
-        success, err = c:connect(a)
+        _, err = c:connect(a)
         if err then return nil, err end
 
         c:send(ns)
@@ -128,7 +121,7 @@ function _M.new(address)
                 local t, s = netstring.decode(buffer)
                 buffer = s
                 if t then
-                    for i,v in pairs(t) do
+                    for _,v in pairs(t) do
                         if not curfield then curfield = v
                         else
                             if curfield == "stdout" then
@@ -165,7 +158,7 @@ function _M.new(address)
             ret.exitcode = nil
         end
         if #ret.termsig then
-            ret.termsig = tonumber(ret.termsig) 
+            ret.termsig = tonumber(ret.termsig)
         else
             ret.termsig = nil
         end
