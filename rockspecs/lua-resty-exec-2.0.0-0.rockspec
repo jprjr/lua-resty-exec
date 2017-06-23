@@ -12,8 +12,8 @@ description = {
 build = {
     type = "builtin",
     modules = {
-        ["resty.exec"] = "lib/resty/exec.lua"
-        ["resty.exec.socket"] = "lib/resty/exec/socket.lua"
+        ["resty.exec"] = "lib/resty/exec.lua",
+        ["resty.exec.socket"] = "lib/resty/exec/socket.lua",
     }
 }
 dependencies = {
