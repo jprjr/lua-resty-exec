@@ -11,8 +11,20 @@ difference being this module uses sockexec, which doesn't spawn a shell -
 instead you provide an array of argument strings, which means you don't need
 to worry about shell escaping/quoting/parsing rules.
 
+Additionally, as of version 2.0.0, you can use `resty.exec.socket` to access a
+lower-level interface that allows two-way communication with programs. You can
+read and write to running applications!
+
 This requires your web server to have an active instance of
 [sockexec](https://github.com/jprjr/sockexec) running.
+
+## Changelog
+
+* `2.0.0`
+  * New `resty.exec.socket` module for using a duplex connection
+  * `resty.exec` no longer uses the `bufsize` argument
+  * `resty.exec` now accepts a `timeout` argument, specify in milliseconds, defaults to 60s
+* No changelog before `2.0.0`
 
 ## Installation
 
@@ -26,7 +38,7 @@ module installed, ie `luarocks install luasocket`.
 Additionally, you'll need `sockexec` running, see [its repo](https://github.com/jprjr/sockexec)
 for instructions.
 
-## Usage
+## `resty.exec` Usage
 
 ```lua
 local exec = require'resty.exec'
@@ -105,10 +117,6 @@ Please note that there's no guarantees of stdout/stderr being a complete
 string, or anything particularly sensible for that matter!
 
 ```lua
--- set bufsize to some smaller value, the default is 4096
--- this allows data to stream in smaller chunks
-prog.bufsize = 10
-
 prog.stdout = function(data)
     ngx.print(data)
     ngx.flush(true)
@@ -173,6 +181,91 @@ local res, err = prog('idgaf','sleep','10')
 This will basically accomplish the same thing `start-stop-daemon` does without
 requiring a billion flags.
 
+## `resty.exec.socket` Usage
+
+```lua
+local exec_socket = require'resty.exec.socket'
+
+-- you can specify timeout in milliseconds, optional
+local client = resty_socket:new({ timeout = 60000 })
+
+-- every new program instance requires a new
+-- call to connect
+local ok, err = client:connect('/tmp/exec.sock')
+
+-- send program arguments, only accepts a table of
+-- arguments
+client:send_args({'cat'})
+
+-- send data for stdin
+client:send('hello there')
+
+-- receive data
+local data, typ, err = client:receive()
+
+-- `typ` can be one of:
+--    `stdout`   - data from the program's stdout
+--    `stderr`   - data from the program's stderr
+--    `exitcode` - the program's exit code
+--    `termsig`  - if terminated via signal, what signal was used
+
+-- if `err` is set, data and typ will be nil
+-- common `err` values are `closed` and `timeout`
+print(string.format('Received %s data: %s',typ,data)
+-- will print 'Received stdout data: hello there'
+
+client:send('hey this cat process is still running')
+data, typ, err = client:receive()
+print(string.format('Received %s data: %s',typ,data)
+-- will print 'Received stdout data: hey this cat process is still running'
+
+client:send_close() -- closes stdin
+data, typ, err = client:receive()
+print(string.format('Received %s data: %s',typ,data)
+-- will print 'Received exitcode data: 0'
+
+data, typ, err = client:receive()
+print(err) -- will print 'closed'
+
+### `client` object methods:
+
+* **`ok, err = client:connect(path)`**
+
+Connects via unix socket to the path given. If this is running
+in nginx, the `unix:` string will be prepended automatically.
+
+* **`bytes, err = client:send_args(args)`**
+
+Sends a table of arguments to sockexec and starts the program.
+
+* **`bytes, err = client:send_data(data)`**
+
+Sends `data` to the program's standard input
+
+* **`bytes, err = client:send(data)`**
+
+Just a shortcut to `client:send_data(data)`
+
+* **`bytes, err = client:send_close()`**
+
+Closes the program's standard input. You can also send an empty
+string, like `client:send_data('')`
+
+* **`data, typ, err = client:receive()`**
+
+Receives data from the running process. `typ` indicates the type
+of data, which can be `stdout`, `stderr`, `termsig`, `exitcode`
+
+`err` is typically either `closed` or `timeout`
+
+* **`client:close()`**
+
+Forcefully closes the client connection
+
+* **`client:getfd()`**
+
+A getfd method, useful if you want to monitor the underlying socket
+connection in a select loop
 
 ## Some example nginx configs
 
@@ -234,7 +327,6 @@ location /cat-2 {
 location /slow-print {
     content_by_lua_block {
         local prog = require'resty.exec'.new('/tmp/exec.sock')
-        prog.bufsize = 10
         prog.stdout = function(v)
             ngx.print(v)
             ngx.flush(true)
