@@ -24,6 +24,7 @@ This requires your web server to have an active instance of
   * New `resty.exec.socket` module for using a duplex connection
   * `resty.exec` no longer uses the `bufsize` argument
   * `resty.exec` now accepts a `timeout` argument, specify in milliseconds, defaults to 60s
+  * This is a major revision, please test thoroughly before upgrading!
 * No changelog before `2.0.0`
 
 ## Installation
