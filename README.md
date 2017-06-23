@@ -227,6 +227,7 @@ print(string.format('Received %s data: %s',typ,data)
 
 data, typ, err = client:receive()
 print(err) -- will print 'closed'
+```
 
 ### `client` object methods:
 
