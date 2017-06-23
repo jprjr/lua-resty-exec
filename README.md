@@ -188,7 +188,7 @@ requiring a billion flags.
 local exec_socket = require'resty.exec.socket'
 
 -- you can specify timeout in milliseconds, optional
-local client = resty_socket:new({ timeout = 60000 })
+local client = exec_socket:new({ timeout = 60000 })
 
 -- every new program instance requires a new
 -- call to connect
