@@ -162,7 +162,7 @@ local function grab_ns(self, timeout)
 end
 
 local _M = {
-  _VERSION = '2.0.0'
+  _VERSION = '2.0.1'
 }
 local mt = { __index = _M }
 
@@ -185,11 +185,11 @@ function _M.new(self, opts) -- luacheck: ignore
     timeout = timeout / 1000
   end
 
-  self.timeout = timeout
   sock:settimeout(timeout)
 
   return setmetatable({
     sock = sock,
+    timeout = timeout,
     args_sent = false,
     bufsize = -1,
     bufsize_cur = 0,

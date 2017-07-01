@@ -3,7 +3,7 @@ local tonumber = tonumber
 local table_unpack = unpack or table.unpack -- luacheck: compat
 
 local _M = {
-  _VERSION = "2.0.0"
+  _VERSION = "2.0.1"
 }
 
 function _M.new(address)
