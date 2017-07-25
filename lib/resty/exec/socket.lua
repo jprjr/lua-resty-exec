@@ -162,7 +162,7 @@ local function grab_ns(self, timeout)
 end
 
 local _M = {
-  _VERSION = '2.0.1'
+  _VERSION = '3.0.0'
 }
 local mt = { __index = _M }
 

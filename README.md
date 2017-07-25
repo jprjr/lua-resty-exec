@@ -20,6 +20,8 @@ This requires your web server to have an active instance of
 
 ## Changelog
 
+* `3.0.0`
+  * new field returned: `unknown` - if this happens please send me a bug!
 * `2.0.0`
   * New `resty.exec.socket` module for using a duplex connection
   * `resty.exec` no longer uses the `bufsize` argument
