@@ -35,7 +35,7 @@ local function ns_send(sock,...)
 
   local bytes, err = sock:send(ns)
   if err then
-    return nil, 'socket: ' .. nserr
+    return nil, 'socket: ' .. err
   end
   return bytes, nil
 end
