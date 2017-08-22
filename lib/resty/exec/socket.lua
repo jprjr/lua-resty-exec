@@ -14,6 +14,11 @@ else
   unix = require'socket.unix'
 end
 
+local _M = {
+  _VERSION = '3.0.3'
+}
+local mt = { __index = _M }
+
 local function ns_encode(...)
   local ns, nserr = netstring.encode(unpack({...}))
   if nserr then
@@ -160,11 +165,6 @@ local function grab_ns(self, timeout)
 
   return true, nil
 end
-
-local _M = {
-  _VERSION = '3.0.1'
-}
-local mt = { __index = _M }
 
 function _M.new(self, opts) -- luacheck: ignore
   local sock, err = unix()

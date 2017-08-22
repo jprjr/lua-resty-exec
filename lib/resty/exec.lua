@@ -5,7 +5,7 @@ local insert = table.insert
 local concat = table.concat
 
 local _M = {
-  _VERSION = "3.0.1"
+  _VERSION = "3.0.3"
 }
 
 function _M.new(address)
