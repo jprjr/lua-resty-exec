@@ -279,6 +279,12 @@ Assuming you're running sockexec at `/tmp/exec.sock`
 $ sockexec /tmp/exec.sock
 ```
 
+Change `/tmp/exec.sock` nginx user owner 
+
+```
+$ chown www-data:www-data /tmp/exec.sock
+```
+
 Then in your nginx config:
 
 ```nginx
